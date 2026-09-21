@@ -1,0 +1,16 @@
+{
+  "short_name": "Saathi Care",
+  "name": "Saathi Care — Public Health Care Continuity",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#F8FAF8",
+  "theme_color": "#164E43",
+  "display": "standalone",
+  "orientation": "portrait-primary"
+}

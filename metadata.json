@@ -1,0 +1,6 @@
+{
+  "name": "Saathi Care",
+  "description": "Public health access and care continuity platform connecting patients, frontline workers, PHCs, doctors, referrals, diagnostics, and medicines for rural and underserved communities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
