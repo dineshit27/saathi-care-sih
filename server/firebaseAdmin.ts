@@ -93,6 +93,44 @@ export function getAdminFirestore(): Firestore | null {
   }
 }
 
-export function isFirebaseConnected(): boolean {
-  return isConnected || Boolean(configProjectId);
+export interface HealthCheckResult {
+  database: 'connected' | 'disconnected' | 'error';
+  firebase: 'connected' | 'disconnected' | 'error';
+  latencyMs?: number;
 }
+
+export async function checkFirestoreHealth(): Promise<HealthCheckResult> {
+  const db = getAdminFirestore();
+  if (!db) {
+    return {
+      database: 'disconnected',
+      firebase: isConnected ? 'connected' : 'disconnected'
+    };
+  }
+
+  try {
+    const start = Date.now();
+    // Real probe with timeout protection
+    await Promise.race([
+      db.collection('test').doc('connection').get(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore probe timeout')), 3500))
+    ]);
+    const latencyMs = Date.now() - start;
+    return {
+      database: 'connected',
+      firebase: 'connected',
+      latencyMs
+    };
+  } catch (err: any) {
+    console.warn('[FirebaseAdmin Health Probe] Ping error:', err?.message || err);
+    return {
+      database: 'disconnected',
+      firebase: 'error'
+    };
+  }
+}
+
+export function isFirebaseConnected(): boolean {
+  return isConnected && Boolean(adminApp);
+}
+

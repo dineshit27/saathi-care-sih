@@ -15,6 +15,7 @@ import { FollowUpManager } from './features/followup/FollowUpManager';
 import { DistrictAnalytics } from './features/analytics/DistrictAnalytics';
 import { AuditLogViewer } from './features/audit/AuditLogViewer';
 import { DemoControlPanel } from './features/demo/DemoControlPanel';
+import { BrandLogo } from './components/common/BrandLogo';
 import { Activity, ShieldCheck, PhoneCall, Building2 } from 'lucide-react';
 
 const MainAppContent: React.FC = () => {
@@ -100,16 +101,14 @@ const MainAppContent: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-6 border-b border-emerald-800/80">
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400">
-                  <Activity className="w-4 h-4" />
-                </div>
-                <span className="font-extrabold text-base text-white tracking-tight">
-                  साथी केअर (Saathi Care)
-                </span>
-              </div>
+              <BrandLogo
+                size="sm"
+                showWordmark={true}
+                variant="light"
+                taglineText="साथी केअर"
+              />
               <p className="text-xs text-emerald-200/90 leading-relaxed">
-                Connected care. Closer to home. Integrated public health access and care continuity platform for rural Maharashtra.
+                Connected care. Closer to home. Integrated public health access and care continuity platform for rural communities.
               </p>
             </div>
 

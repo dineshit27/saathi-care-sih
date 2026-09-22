@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../services/store';
 import { QueueEntry } from '../../types';
+import { BrandLogo } from '../../components/common/BrandLogo';
 
 export const QueueManager: React.FC = () => {
   const { queue, updateQueueStatus, currentUser, t } = useApp();
@@ -43,8 +44,9 @@ export const QueueManager: React.FC = () => {
       <div className="bg-white border-2 border-stone-200 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
+            <BrandLogo size="xs" />
             <span className="text-xs font-bold uppercase bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full">
-              PHC OPD Queue Engine
+              Saathi PHC Queue Engine
             </span>
             <span className="text-xs text-stone-500 font-mono">
               Live Token Dispatcher
@@ -87,13 +89,16 @@ export const QueueManager: React.FC = () => {
       {isTvDisplayMode ? (
         <div className="bg-[#0F362E] text-white rounded-3xl p-8 shadow-2xl border-4 border-amber-400 space-y-8 animate-in fade-in">
           <div className="flex items-center justify-between border-b border-emerald-800 pb-4">
-            <div>
-              <span className="text-amber-400 font-bold uppercase tracking-widest text-sm">
-                GOVERNMENT OF MAHARASHTRA • PUBLIC HEALTH DEPARTMENT
-              </span>
-              <h2 className="text-3xl font-black tracking-tight mt-1">
-                Shirur Primary Health Centre — OPD Live Queue
-              </h2>
+            <div className="flex items-center gap-4">
+              <BrandLogo size="lg" variant="light" />
+              <div>
+                <span className="text-amber-400 font-bold uppercase tracking-widest text-xs sm:text-sm">
+                  Saathi Care Connected Network • Public Health Department
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">
+                  Shirur Primary Health Centre — OPD Live Queue
+                </h2>
+              </div>
             </div>
             <div className="text-right">
               <span className="text-emerald-300 text-sm font-mono block">Current Time</span>

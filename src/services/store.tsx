@@ -140,6 +140,9 @@ export interface AppContextType {
   isSyncing: boolean;
   lastSyncedAt: string;
   syncOfflineQueue: () => Promise<void>;
+  isLiveConnected: boolean;
+  dataSource: 'live' | 'cached' | 'offline';
+  isDemoPersona: boolean;
 
   // Data Collections (Persistent & Real-Time)
   facilities: Facility[];
@@ -363,10 +366,29 @@ const InnerAppProvider: React.FC<{ children: React.ReactNode }> = ({ children })
 
   const [language, setLanguageState] = useState<LanguageCode>(() => loadSaved('lang', 'mr'));
 
-  const [isOffline, setIsOffline] = useState<boolean>(false);
+  const [isOffline, setIsOffline] = useState<boolean>(() => !navigator.onLine);
   const [offlineQueue, setOfflineQueue] = useState<OfflineAction[]>(() => loadSaved('offline_q', []));
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string>('Just now');
+  const [isLiveConnected, setIsLiveConnected] = useState<boolean>(true);
+
+  // Monitor network connectivity changes automatically
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      setIsLiveConnected(true);
+    };
+    const handleOffline = () => {
+      setIsOffline(true);
+      setIsLiveConnected(false);
+    };
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Core Data States (Initialized from cache/mock, synchronized with Firestore in real-time)
   const [facilities, setFacilities] = useState<Facility[]>(initialFacilities);
@@ -383,139 +405,143 @@ const InnerAppProvider: React.FC<{ children: React.ReactNode }> = ({ children })
   const [demoScenarioStep, setDemoScenarioStep] = useState<number>(0);
   const [isDemoAutoPlaying, setIsDemoAutoPlaying] = useState<boolean>(false);
 
-  // Helper to seed Firestore if a collection is empty
+  // Helper to ensure demo database has initial records using protected server endpoint
   const seedIfEmpty = useCallback(async () => {
     try {
-      const patSnap = await getDocs(collection(db, 'patients'));
-      if (patSnap.empty) {
-        console.info('[Firestore] Seeding real database with initial public health records...');
-        // Seed patients
-        for (const p of initialPatients) {
-          await setDoc(doc(db, 'patients', p.id), p);
-        }
-        // Seed queue
-        for (const q of initialQueue) {
-          await setDoc(doc(db, 'queueEntries', q.id), q);
-        }
-        // Seed referrals
-        for (const r of initialReferrals) {
-          await setDoc(doc(db, 'referrals', r.id), r);
-        }
-        // Seed diagnostics
-        for (const d of initialDiagnostics) {
-          await setDoc(doc(db, 'diagnostics', d.id), d);
-        }
-        // Seed medicines
-        for (const m of initialMedicines) {
-          await setDoc(doc(db, 'medicines', m.id), m);
-        }
-        // Seed followups
-        for (const f of initialFollowUps) {
-          await setDoc(doc(db, 'followUps', f.id), f);
-        }
-        // Seed timeline events
-        for (const t of initialTimelineEvents) {
-          await setDoc(doc(db, 'healthRecords', t.id), t);
-        }
-        // Seed notifications
-        for (const n of initialNotifications) {
-          await setDoc(doc(db, 'notifications', n.id), n);
-        }
-        // Seed audit logs
-        for (const a of initialAuditLogs) {
-          await setDoc(doc(db, 'auditLogs', a.id), a);
-        }
-        console.info('[Firestore] Real persistent database seeded successfully.');
-      }
+      if (patients && patients.length > 0) return;
+      // Protected server endpoint
+      await fetch('/api/seed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-demo-mode': 'true' },
+        body: JSON.stringify({ isDemo: true, confirmReset: false })
+      });
     } catch (err) {
       console.warn('[Firestore] Initial seeding check:', err);
     }
-  }, []);
+  }, [patients]);
 
-  // Real-time Firestore Listeners (`onSnapshot`)
+  // Real-time Firestore Listeners (`onSnapshot`) with lifecycle hardening
   useEffect(() => {
     seedIfEmpty();
 
     // 1. Patients Real-Time Listener
     const unsubPatients = onSnapshot(collection(db, 'patients'), (snapshot) => {
+      setIsLiveConnected(true);
       if (!snapshot.empty) {
         const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Patient));
         setPatients(list);
         localStorage.setItem(`${STORAGE_KEY}_patients`, JSON.stringify(list));
       }
-    }, (err) => console.warn('[Firestore onSnapshot] Patients listener error:', err.message));
+    }, (err) => {
+      console.warn('[Firestore onSnapshot] Patients listener notice:', err.message);
+      if (err.code === 'unavailable') setIsLiveConnected(false);
+    });
 
     // 2. Queue Real-Time Listener
     const unsubQueue = onSnapshot(collection(db, 'queueEntries'), (snapshot) => {
+      setIsLiveConnected(true);
       if (!snapshot.empty) {
         const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as QueueEntry));
         setQueue(list);
         localStorage.setItem(`${STORAGE_KEY}_queue`, JSON.stringify(list));
       }
-    }, (err) => console.warn('[Firestore onSnapshot] Queue listener error:', err.message));
+    }, (err) => {
+      console.warn('[Firestore onSnapshot] Queue listener notice:', err.message);
+      if (err.code === 'unavailable') setIsLiveConnected(false);
+    });
 
     // 3. Referrals Real-Time Listener
     const unsubReferrals = onSnapshot(collection(db, 'referrals'), (snapshot) => {
+      setIsLiveConnected(true);
       if (!snapshot.empty) {
         const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Referral));
         setReferrals(list);
         localStorage.setItem(`${STORAGE_KEY}_referrals`, JSON.stringify(list));
       }
-    }, (err) => console.warn('[Firestore onSnapshot] Referrals listener error:', err.message));
+    }, (err) => {
+      console.warn('[Firestore onSnapshot] Referrals listener notice:', err.message);
+      if (err.code === 'unavailable') setIsLiveConnected(false);
+    });
 
     // 4. Diagnostics Real-Time Listener
     const unsubDiagnostics = onSnapshot(collection(db, 'diagnostics'), (snapshot) => {
+      setIsLiveConnected(true);
       if (!snapshot.empty) {
         const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as DiagnosticOrder));
         setDiagnostics(list);
         localStorage.setItem(`${STORAGE_KEY}_diagnostics`, JSON.stringify(list));
       }
-    }, (err) => console.warn('[Firestore onSnapshot] Diagnostics listener error:', err.message));
+    }, (err) => {
+      console.warn('[Firestore onSnapshot] Diagnostics listener notice:', err.message);
+      if (err.code === 'unavailable') setIsLiveConnected(false);
+    });
 
     // 5. Medicines Real-Time Listener
     const unsubMedicines = onSnapshot(collection(db, 'medicines'), (snapshot) => {
+      setIsLiveConnected(true);
       if (!snapshot.empty) {
         const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as MedicineStock));
         setMedicines(list);
         localStorage.setItem(`${STORAGE_KEY}_medicines`, JSON.stringify(list));
       }
-    }, (err) => console.warn('[Firestore onSnapshot] Medicines listener error:', err.message));
+    }, (err) => {
+      console.warn('[Firestore onSnapshot] Medicines listener notice:', err.message);
+      if (err.code === 'unavailable') setIsLiveConnected(false);
+    });
 
     // 6. FollowUps Real-Time Listener
     const unsubFollowUps = onSnapshot(collection(db, 'followUps'), (snapshot) => {
+      setIsLiveConnected(true);
       if (!snapshot.empty) {
         const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as FollowUpTask));
         setFollowUps(list);
         localStorage.setItem(`${STORAGE_KEY}_followups`, JSON.stringify(list));
       }
-    }, (err) => console.warn('[Firestore onSnapshot] FollowUps listener error:', err.message));
+    }, (err) => {
+      console.warn('[Firestore onSnapshot] FollowUps listener notice:', err.message);
+      if (err.code === 'unavailable') setIsLiveConnected(false);
+    });
 
     // 7. Timeline Events (HealthRecords) Real-Time Listener
     const unsubTimeline = onSnapshot(collection(db, 'healthRecords'), (snapshot) => {
+      setIsLiveConnected(true);
       if (!snapshot.empty) {
         const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as HealthTimelineEvent));
         setTimelineEvents(list);
         localStorage.setItem(`${STORAGE_KEY}_timeline`, JSON.stringify(list));
       }
-    }, (err) => console.warn('[Firestore onSnapshot] Timeline listener error:', err.message));
+    }, (err) => {
+      console.warn('[Firestore onSnapshot] Timeline listener notice:', err.message);
+      if (err.code === 'unavailable') setIsLiveConnected(false);
+    });
 
     // 8. Notifications Real-Time Listener
     const unsubNotifications = onSnapshot(collection(db, 'notifications'), (snapshot) => {
+      setIsLiveConnected(true);
       if (!snapshot.empty) {
         const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as AppNotification));
         setNotifications(list);
         localStorage.setItem(`${STORAGE_KEY}_notifs`, JSON.stringify(list));
       }
-    }, (err) => console.warn('[Firestore onSnapshot] Notifications listener error:', err.message));
+    }, (err) => {
+      console.warn('[Firestore onSnapshot] Notifications listener notice:', err.message);
+      if (err.code === 'unavailable') setIsLiveConnected(false);
+    });
 
-    // 9. Audit Logs Real-Time Listener
-    const unsubAudit = onSnapshot(collection(db, 'auditLogs'), (snapshot) => {
-      if (!snapshot.empty) {
-        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as AuditLogEntry));
-        setAuditLogs(list);
-        localStorage.setItem(`${STORAGE_KEY}_audit`, JSON.stringify(list));
-      }
-    }, (err) => console.warn('[Firestore onSnapshot] Audit listener error:', err.message));
+    // 9. Audit Logs Real-Time Listener (only if authorized healthcare user)
+    let unsubAudit = () => {};
+    if (currentUser.role !== 'patient') {
+      unsubAudit = onSnapshot(collection(db, 'auditLogs'), (snapshot) => {
+        setIsLiveConnected(true);
+        if (!snapshot.empty) {
+          const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as AuditLogEntry));
+          setAuditLogs(list);
+          localStorage.setItem(`${STORAGE_KEY}_audit`, JSON.stringify(list));
+        }
+      }, (err) => {
+        console.warn('[Firestore onSnapshot] Audit listener notice:', err.message);
+      });
+    }
 
     return () => {
       unsubPatients();
@@ -528,7 +554,7 @@ const InnerAppProvider: React.FC<{ children: React.ReactNode }> = ({ children })
       unsubNotifications();
       unsubAudit();
     };
-  }, [seedIfEmpty]);
+  }, [seedIfEmpty, currentUser.role]);
 
   // Local storage backup for current session
   useEffect(() => {
@@ -1372,26 +1398,13 @@ const InnerAppProvider: React.FC<{ children: React.ReactNode }> = ({ children })
     setDemoScenarioStep(0);
     setIsOffline(false);
 
-    // Also re-seed Firestore with clean synthetic dataset
+    // Also re-seed Firestore with clean synthetic dataset via protected server endpoint
     try {
-      for (const p of initialPatients) {
-        await setDoc(doc(db, 'patients', p.id), p);
-      }
-      for (const q of initialQueue) {
-        await setDoc(doc(db, 'queueEntries', q.id), q);
-      }
-      for (const r of initialReferrals) {
-        await setDoc(doc(db, 'referrals', r.id), r);
-      }
-      for (const d of initialDiagnostics) {
-        await setDoc(doc(db, 'diagnostics', d.id), d);
-      }
-      for (const m of initialMedicines) {
-        await setDoc(doc(db, 'medicines', m.id), m);
-      }
-      for (const f of initialFollowUps) {
-        await setDoc(doc(db, 'followUps', f.id), f);
-      }
+      await fetch('/api/seed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-demo-mode': 'true' },
+        body: JSON.stringify({ isDemo: true, confirmReset: true })
+      });
     } catch (e) {
       console.warn('[Firestore] Reset error:', e);
     }
@@ -1509,6 +1522,9 @@ const InnerAppProvider: React.FC<{ children: React.ReactNode }> = ({ children })
     }
   };
 
+  const dataSource: 'live' | 'cached' | 'offline' = isOffline ? 'offline' : (isLiveConnected ? 'live' : 'cached');
+  const isDemoPersona = !firebaseUser;
+
   return (
     <AppContext.Provider
       value={{
@@ -1531,6 +1547,9 @@ const InnerAppProvider: React.FC<{ children: React.ReactNode }> = ({ children })
         isSyncing,
         lastSyncedAt,
         syncOfflineQueue,
+        isLiveConnected,
+        dataSource,
+        isDemoPersona,
         facilities,
         patients,
         queue,

@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { AuthenticatedRequest, requireRole } from '../middleware/auth';
 import { getCollectionDocs, getDocById, setDocument, updateDocument } from '../dbHelper';
 
 export const referralsRouter = Router();
@@ -10,18 +10,48 @@ referralsRouter.get('/', async (req: AuthenticatedRequest, res: Response) => {
     const referrals = await getCollectionDocs('referrals');
     res.json({ success: true, count: referrals.length, data: referrals });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Failed to fetch referrals' }
+    });
   }
 });
 
 // POST /api/referrals
-referralsRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
+referralsRouter.post('/', requireRole('doctor', 'facility', 'asha'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const data = req.body;
-    const refId = `REF-2026-MH-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    if (!data.patientId) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_INPUT', message: 'patientId is required for referral creation.' }
+      });
+    }
+
+    if (!data.toFacilityName && !data.toFacilityId) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_INPUT', message: 'Target referral destination facility is required.' }
+      });
+    }
+
+    const patient = await getDocById('patients', data.patientId);
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: `Patient with ID '${data.patientId}' does not exist.` }
+      });
+    }
+
+    const refId = data.id || `REF-2026-MH-${Math.floor(1000 + Math.random() * 9000)}`;
     const referral = {
       ...data,
       id: refId,
+      patientName: data.patientName || patient.name,
+      patientAge: data.patientAge || patient.age,
+      patientGender: data.patientGender || patient.gender,
+      patientVillage: data.patientVillage || patient.village,
       status: data.status || 'sent',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -31,16 +61,13 @@ referralsRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
     const saved = await setDocument('referrals', refId, referral);
 
     // Update patient care continuity score
-    const patient = await getDocById('patients', referral.patientId);
-    if (patient) {
-      await updateDocument('patients', referral.patientId, {
-        careContinuityScore: {
-          ...(patient.careContinuityScore || { completedSteps: 2, totalSteps: 5 }),
-          completedSteps: Math.max(patient.careContinuityScore?.completedSteps || 2, 3),
-          lastMilestone: `Referral Initiated to ${referral.toFacilityName}`
-        }
-      });
-    }
+    await updateDocument('patients', referral.patientId, {
+      careContinuityScore: {
+        ...(patient.careContinuityScore || { completedSteps: 2, totalSteps: 5 }),
+        completedSteps: Math.max(patient.careContinuityScore?.completedSteps || 2, 3),
+        lastMilestone: `Referral Initiated to ${referral.toFacilityName || 'District Facility'}`
+      }
+    });
 
     // Timeline event
     const evtId = `evt-${Date.now()}`;
@@ -48,13 +75,13 @@ referralsRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
       id: evtId,
       patientId: referral.patientId,
       timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-      facilityId: referral.fromFacilityId,
-      facilityName: referral.fromFacilityName,
+      facilityId: referral.fromFacilityId || req.user?.facilityId || 'fac-phc-shirur',
+      facilityName: referral.fromFacilityName || 'Shirur PHC',
       providerName: req.user?.name || referral.referringDoctorName || 'Medical Officer',
       providerRole: 'Medical Officer',
       eventType: 'referral_created',
       title: `Inter-Facility Referral Created (${referral.toFacilityName})`,
-      notes: `Reason: ${referral.reason}. Specialist: ${referral.specialistRequired}. Provisional: ${referral.provisionalDiagnosis}. Transport: ${referral.transportAssisted ? 'Yes' : 'Self'}.`,
+      notes: `Reason: ${referral.reason || 'Specialist Evaluation'}. Specialist: ${referral.specialistRequired || 'General Physician'}. Provisional: ${referral.provisionalDiagnosis || 'Clinical Review'}.`,
       badgeType: 'urgent'
     });
 
@@ -64,7 +91,7 @@ referralsRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
       id: notifId,
       recipientRole: 'facility',
       title: 'New Incoming Referral',
-      message: `Referral received for ${referral.patientName} from ${referral.fromFacilityName}.`,
+      message: `Referral received for ${referral.patientName} from ${referral.fromFacilityName || 'PHC'}.`,
       type: 'referral',
       read: false,
       timestamp: 'Just now'
@@ -72,21 +99,36 @@ referralsRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
 
     res.status(201).json({ success: true, data: saved });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Failed to create referral' }
+    });
   }
 });
 
 // PATCH /api/referrals/:id
-referralsRouter.patch('/:id', async (req: AuthenticatedRequest, res: Response) => {
+referralsRouter.patch('/:id', requireRole('doctor', 'facility'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { status, appointmentDate, appointmentTime } = req.body;
+    const validStatuses = ['sent', 'accepted', 'scheduled', 'completed', 'cancelled', 'rejected'];
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_INPUT', message: `Invalid referral status. Valid: ${validStatuses.join(', ')}` }
+      });
+    }
+
     const ref = await getDocById('referrals', req.params.id);
     if (!ref) {
-      return res.status(404).json({ success: false, error: 'Referral not found' });
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Referral not found' }
+      });
     }
 
     const updates: any = {
-      status,
+      status: status || ref.status,
+      updatedAt: new Date().toISOString(),
       updatedBy: req.user?.name || 'Facility Staff',
       ...(appointmentDate ? { appointmentDate } : {}),
       ...(appointmentTime ? { appointmentTime } : {})
@@ -95,7 +137,7 @@ referralsRouter.patch('/:id', async (req: AuthenticatedRequest, res: Response) =
     const updated = await updateDocument('referrals', req.params.id, updates);
 
     // Timeline event
-    let timelineTitle = `Referral Status: ${status.replace('_', ' ').toUpperCase()}`;
+    let timelineTitle = `Referral Status: ${(status || ref.status).replace('_', ' ').toUpperCase()}`;
     let badgeType = 'default';
     if (status === 'accepted') {
       timelineTitle = `Referral Accepted by ${ref.toFacilityName}`;
@@ -140,7 +182,7 @@ referralsRouter.patch('/:id', async (req: AuthenticatedRequest, res: Response) =
       });
     }
 
-    // Notify frontline worker and patient
+    // Notify frontline worker
     const notifId = `notif-${Date.now()}`;
     await setDocument('notifications', notifId, {
       id: notifId,
@@ -154,6 +196,10 @@ referralsRouter.patch('/:id', async (req: AuthenticatedRequest, res: Response) =
 
     res.json({ success: true, data: updated });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Failed to update referral' }
+    });
   }
 });
+

@@ -1,11 +1,11 @@
 import { Router, Response } from 'express';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { AuthenticatedRequest, requireRole } from '../middleware/auth';
 import { getCollectionDocs } from '../dbHelper';
 
 export const analyticsRouter = Router();
 
-// GET /api/analytics
-analyticsRouter.get('/', async (req: AuthenticatedRequest, res: Response) => {
+// GET /api/analytics - Protected for healthcare administrative roles
+analyticsRouter.get('/', requireRole('admin', 'facility', 'doctor', 'asha'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const [patients, queue, referrals, diagnostics, medicines, followups] = await Promise.all([
       getCollectionDocs('patients'),
@@ -52,6 +52,10 @@ analyticsRouter.get('/', async (req: AuthenticatedRequest, res: Response) => {
       }
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Failed to compute analytics' }
+    });
   }
 });
+

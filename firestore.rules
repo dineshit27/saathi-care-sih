@@ -2,80 +2,139 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper functions for authentication and RBAC
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // Helper functions for validating fields
-    function hasRequiredFields(fields) {
-      return request.resource.data.keys().hasAll(fields);
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
-    // Allow read/write to public healthcare collections with validation
+    function getUserRole() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? getUserData().role
+        : 'none';
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'm.dinesh.it27@gmail.com' ||
+        (request.auth.token.role != null && request.auth.token.role in ['DISTRICT_ADMIN', 'admin']) ||
+        getUserRole() in ['admin', 'DISTRICT_ADMIN']
+      );
+    }
+
+    function isHealthcareUser() {
+      return isSignedIn() && (
+        isAdmin() ||
+        (request.auth.token.role != null && request.auth.token.role in ['FRONTLINE_WORKER', 'DOCTOR', 'FACILITY_STAFF', 'DISTRICT_ADMIN', 'asha', 'doctor', 'facility', 'admin']) ||
+        getUserRole() in ['asha', 'doctor', 'facility', 'admin', 'FRONTLINE_WORKER', 'DOCTOR', 'FACILITY_STAFF', 'DISTRICT_ADMIN']
+      );
+    }
+
+    function isOwner(patientUserId) {
+      return isSignedIn() && request.auth.uid == patientUserId;
+    }
+
+    // Users Collection - User profiles and assigned roles
     match /users/{userId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
     }
 
+    // Patients Collection - Clinical health demographics and care records
     match /patients/{patientId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isHealthcareUser() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.abhaId == request.auth.uid));
+      allow create, update: if isHealthcareUser();
+      allow delete: if isAdmin();
     }
 
+    // Queue Entries Collection - Real-time facility consultation tokens
     match /queueEntries/{entryId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isSignedIn();
+      allow create, update: if isHealthcareUser();
+      allow delete: if isHealthcareUser();
     }
 
+    // Referrals Collection - Inter-facility specialist referrals
     match /referrals/{referralId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isHealthcareUser() || (isSignedIn() && resource.data.patientId == request.auth.uid);
+      allow create, update: if isHealthcareUser();
+      allow delete: if isAdmin();
     }
 
+    // Diagnostics Collection - Lab orders and specimen results
     match /diagnostics/{diagnosticId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isHealthcareUser() || (isSignedIn() && resource.data.patientId == request.auth.uid);
+      allow create, update: if isHealthcareUser();
+      allow delete: if isAdmin();
     }
 
+    // Medicines Collection - Public dispensary inventory
     match /medicines/{medicineId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isSignedIn();
+      allow create, update, delete: if isHealthcareUser();
     }
 
+    // Follow-ups Collection - Frontline worker home visits
     match /followUps/{followUpId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isHealthcareUser() || (isSignedIn() && resource.data.patientId == request.auth.uid);
+      allow create, update: if isHealthcareUser();
+      allow delete: if isAdmin();
     }
 
+    // Health Records / Timeline - Longitudinal care history
     match /healthRecords/{recordId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isHealthcareUser() || (isSignedIn() && resource.data.patientId == request.auth.uid);
+      allow create, update: if isHealthcareUser();
+      allow delete: if isAdmin();
     }
 
+    // Notifications Collection - Role-based alerts and personal updates
     match /notifications/{notificationId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isSignedIn() && (
+        resource.data.recipientId == request.auth.uid ||
+        resource.data.recipientRole in ['all', 'asha', 'doctor', 'facility', 'admin', 'patient'] ||
+        isHealthcareUser()
+      );
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (resource.data.recipientId == request.auth.uid || isHealthcareUser());
+      allow delete: if isAdmin();
     }
 
+    // Audit Logs Collection - Compliance and security audit trail
+    // Strictly immutable: No updates, no deletions
     match /auditLogs/{logId} {
-      allow read: if true;
-      allow create: if true;
-      allow update, delete: if false; // Immutable audit log
+      allow read: if isHealthcareUser();
+      allow create: if isHealthcareUser();
+      allow update, delete: if false;
     }
 
+    // Emergency Events Collection - Priority ambulance and hospital SOS
     match /emergencyEvents/{eventId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isHealthcareUser() || (isSignedIn() && resource.data.patientId == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isHealthcareUser();
     }
 
+    // Facilities Directory Collection
     match /facilities/{facilityId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isSignedIn();
+      allow write: if isHealthcareUser();
     }
 
     // Connection testing
     match /test/{docId} {
-      allow read, write: if true;
+      allow read, write: if isSignedIn();
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
+

@@ -11,6 +11,7 @@ import {
   Download
 } from 'lucide-react';
 import { useApp } from '../../services/store';
+import { BrandLogo } from '../../components/common/BrandLogo';
 
 export const AuditLogViewer: React.FC = () => {
   const { auditLogs, t } = useApp();
@@ -44,8 +45,9 @@ export const AuditLogViewer: React.FC = () => {
       <div className="bg-white border-2 border-stone-200 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
+            <BrandLogo size="xs" />
             <span className="text-xs font-bold uppercase bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full">
-              Civic Accountability
+              Saathi Civic Accountability
             </span>
             <span className="text-xs text-stone-500 font-mono">
               Immutable System Ledger

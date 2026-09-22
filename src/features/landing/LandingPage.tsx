@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../services/store';
 import { TabId } from '../../components/layout/NavigationTabs';
+import { BrandLogo } from '../../components/common/BrandLogo';
 
 interface Props {
   setActiveTab: (tab: TabId) => void;
@@ -48,39 +49,61 @@ export const LandingPage: React.FC<Props> = ({ setActiveTab }) => {
         <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-emerald-500/10 pointer-events-none blur-3xl"></div>
         <div className="absolute left-1/3 -top-20 w-80 h-80 rounded-full bg-amber-400/10 pointer-events-none blur-3xl"></div>
 
-        <div className="max-w-3xl relative z-10">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] mb-5">
-            Healthcare shouldn&apos;t depend on how far you live.
-          </h1>
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 relative z-10">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6">
+              <BrandLogo size="xs" variant="light" />
+              <span className="text-xs font-bold text-emerald-100 tracking-wide">
+                Saathi Care • Connected care. Closer to home.
+              </span>
+            </div>
 
-          <p className="text-base sm:text-xl text-emerald-100 font-normal leading-relaxed mb-8 max-w-2xl">
-            {t('heroSubhead')}
-          </p>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] mb-5">
+              Healthcare shouldn&apos;t depend on how far you live.
+            </h1>
 
-          {/* Action CTAs */}
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-            <button
-              onClick={handlePatientCta}
-              className="px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-stone-950 font-black rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 text-sm sm:text-base cursor-pointer"
-            >
-              <span>{t('getCareCta')}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <p className="text-base sm:text-xl text-emerald-100 font-normal leading-relaxed mb-8 max-w-2xl">
+              {t('heroSubhead')}
+            </p>
 
-            <button
-              onClick={handleWorkerCta}
-              className="px-6 py-3.5 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold rounded-2xl transition-all flex items-center gap-2 text-sm sm:text-base cursor-pointer"
-            >
-              <Users className="w-4 h-4 text-emerald-300" />
-              <span>{t('workerLoginCta')}</span>
-            </button>
+            {/* Action CTAs */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <button
+                onClick={handlePatientCta}
+                className="px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-stone-950 font-black rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 text-sm sm:text-base cursor-pointer"
+              >
+                <span>{t('getCareCta')}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
 
-            <button
-              onClick={handleDoctorCta}
-              className="px-4 py-3.5 text-emerald-200 hover:text-white font-semibold text-xs sm:text-sm underline underline-offset-4 cursor-pointer"
-            >
-              Medical Officer Consultation Desk →
-            </button>
+              <button
+                onClick={handleWorkerCta}
+                className="px-6 py-3.5 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold rounded-2xl transition-all flex items-center gap-2 text-sm sm:text-base cursor-pointer"
+              >
+                <Users className="w-4 h-4 text-emerald-300" />
+                <span>{t('workerLoginCta')}</span>
+              </button>
+
+              <button
+                onClick={handleDoctorCta}
+                className="px-4 py-3.5 text-emerald-200 hover:text-white font-semibold text-xs sm:text-sm underline underline-offset-4 cursor-pointer"
+              >
+                Medical Officer Consultation Desk →
+              </button>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex flex-col items-center justify-center p-8 rounded-3xl bg-white/5 border border-white/15 backdrop-blur-md max-w-xs shrink-0 text-center">
+            <BrandLogo size="2xl" variant="light" className="mb-4" />
+            <span className="font-extrabold text-xl text-white tracking-tight">Saathi Care</span>
+            <p className="text-xs text-emerald-200 mt-1">Connected care. Closer to home.</p>
+            <div className="mt-4 pt-4 border-t border-white/10 w-full flex items-center justify-around text-[11px] text-emerald-300">
+              <span>PHC Grid</span>
+              <span>•</span>
+              <span>Offline PWA</span>
+              <span>•</span>
+              <span>AI Triage</span>
+            </div>
           </div>
         </div>
       </section>

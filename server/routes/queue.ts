@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { AuthenticatedRequest, requireRole } from '../middleware/auth';
 import { getCollectionDocs, getDocById, setDocument, updateDocument } from '../dbHelper';
 
 export const queueRouter = Router();
@@ -10,16 +10,47 @@ queueRouter.get('/', async (req: AuthenticatedRequest, res: Response) => {
     const queue = await getCollectionDocs('queueEntries');
     res.json({ success: true, count: queue.length, data: queue });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Failed to fetch queue entries' }
+    });
   }
 });
 
 // POST /api/queue
-queueRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
+queueRouter.post('/', requireRole('asha', 'doctor', 'facility'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { patientId, doctorId } = req.body;
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_INPUT', message: 'patientId is required to join queue.' }
+      });
+    }
+
     const patient = await getDocById('patients', patientId);
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: `Patient with ID '${patientId}' not found.` }
+      });
+    }
+
     const allQueue = await getCollectionDocs('queueEntries');
+
+    // Duplicate protection: prevent double-queueing the same patient in waiting status
+    const alreadyWaiting = allQueue.find((q: any) => q.patientId === patientId && (q.status === 'waiting' || q.status === 'in_consultation'));
+    if (alreadyWaiting) {
+      return res.status(409).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_ENTRY',
+          message: `Patient is already queued with token ${alreadyWaiting.tokenNumber} (Status: ${alreadyWaiting.status}).`
+        },
+        data: alreadyWaiting
+      });
+    }
+
     const tokenNumber = `A00${allQueue.length + 1}`;
     const newId = `q-${Date.now()}`;
 
@@ -74,17 +105,31 @@ queueRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
 
     res.status(201).json({ success: true, data: saved });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Failed to add queue entry' }
+    });
   }
 });
 
 // PATCH /api/queue/:id
-queueRouter.patch('/:id', async (req: AuthenticatedRequest, res: Response) => {
+queueRouter.patch('/:id', requireRole('doctor', 'facility'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { status } = req.body;
+    const validStatuses = ['waiting', 'in_consultation', 'completed', 'deferred', 'no_show'];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_INPUT', message: `Invalid status. Must be one of: ${validStatuses.join(', ')}` }
+      });
+    }
+
     const entry = await getDocById('queueEntries', req.params.id);
     if (!entry) {
-      return res.status(404).json({ success: false, error: 'Queue entry not found' });
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Queue entry not found' }
+      });
     }
 
     const updated = await updateDocument('queueEntries', req.params.id, {
@@ -107,6 +152,10 @@ queueRouter.patch('/:id', async (req: AuthenticatedRequest, res: Response) => {
 
     res.json({ success: true, data: updated });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Failed to update queue entry' }
+    });
   }
 });
+

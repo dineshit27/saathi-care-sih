@@ -17,7 +17,7 @@ import { notificationsRouter } from './server/routes/notifications';
 import { analyticsRouter } from './server/routes/analytics';
 import { aiRouter } from './server/routes/ai';
 import { seedRouter } from './server/routes/seed';
-import { isFirebaseConnected } from './server/firebaseAdmin';
+import { checkFirestoreHealth } from './server/firebaseAdmin';
 
 dotenv.config();
 
@@ -28,15 +28,31 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 // Health check endpoint conforming to specification
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    database: isFirebaseConnected() ? 'connected' : 'connected',
-    service: 'Saathi Care Core Public Health API',
-    version: '1.0.0',
-    hasGeminiKey: Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'MY_GEMINI_API_KEY'),
-    timestamp: new Date().toISOString()
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    const health = await checkFirestoreHealth();
+    const isDegraded = health.database !== 'connected';
+    
+    res.status(isDegraded ? 200 : 200).json({
+      status: isDegraded ? 'degraded' : 'ok',
+      database: health.database,
+      firebase: health.firebase,
+      latencyMs: health.latencyMs,
+      service: 'Saathi Care Core Public Health API',
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'production',
+      hasGeminiKey: Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'MY_GEMINI_API_KEY'),
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    res.status(503).json({
+      status: 'degraded',
+      database: 'disconnected',
+      firebase: 'error',
+      environment: process.env.NODE_ENV || 'production',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Seed endpoint

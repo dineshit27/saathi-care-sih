@@ -9,7 +9,14 @@ function getGeminiAI(): GoogleGenAI | null {
     return null;
   }
   if (!aiClient) {
-    aiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    aiClient = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
+      },
+    });
   }
   return aiClient;
 }
@@ -41,7 +48,7 @@ Return a JSON object with:
 
       try {
         const response = await ai.models.generateContent({
-          model: 'gemini-3.6-flash',
+          model: 'gemini-3.8-flash',
           contents: prompt,
           config: {
             responseMimeType: 'application/json',
@@ -49,14 +56,21 @@ Return a JSON object with:
         });
 
         if (response.text) {
-          return res.json({ success: true, ...JSON.parse(response.text) });
+          const parsed = JSON.parse(response.text);
+          return res.json({
+            success: true,
+            isAiGenerated: true,
+            engine: 'Gemini • Online',
+            safetyNotice: 'AI-assisted information — verify with a healthcare professional.',
+            ...parsed
+          });
         }
       } catch (geminiErr: any) {
         console.warn('[AI Triage] Gemini API warning, falling back to rule matrix:', geminiErr?.message || geminiErr);
       }
     }
 
-    // Algorithmic clinical fallback if GEMINI_API_KEY is not set
+    // Algorithmic clinical fallback if GEMINI_API_KEY is not set or failed
     const systolic = Number(vitals?.systolicBp || 120);
     const diastolic = Number(vitals?.diastolicBp || 80);
     const spo2 = Number(vitals?.spo2 || 98);
@@ -78,6 +92,9 @@ Return a JSON object with:
 
     res.json({
       success: true,
+      isAiGenerated: false,
+      engine: 'Offline clinical rules (Fallback mode)',
+      safetyNotice: 'AI-assisted information — verify with a healthcare professional.',
       riskLevel,
       urgencyScore,
       primaryAssessment: riskLevel === 'urgent'
@@ -91,7 +108,13 @@ Return a JSON object with:
       ashaGuidance: 'Ensure patient rests in seated position. Re-verify BP after 10 minutes. Prepare digital transfer pass.'
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: error.message || 'An unexpected error occurred during triage evaluation'
+      }
+    });
   }
 });
 
@@ -105,19 +128,37 @@ aiRouter.post('/translate', async (req: Request, res: Response) => {
       try {
         const prompt = `Translate this Indian healthcare clinical message accurately into ${targetLanguage === 'mr' ? 'Marathi' : targetLanguage === 'hi' ? 'Hindi' : 'English'}. Keep medical terminology understandable for rural patients. Text: "${text}"`;
         const response = await ai.models.generateContent({
-          model: 'gemini-3.6-flash',
+          model: 'gemini-3.8-flash',
           contents: prompt,
         });
 
-        return res.json({ success: true, translatedText: response.text?.trim() });
+        return res.json({
+          success: true,
+          translatedText: response.text?.trim(),
+          isAiGenerated: true,
+          engine: 'Gemini • Online',
+          safetyNotice: 'AI-assisted translation — verify important medical information with a healthcare professional.'
+        });
       } catch (geminiErr: any) {
         console.warn('[AI Translate] Gemini warning:', geminiErr?.message || geminiErr);
       }
     }
 
-    res.json({ success: true, translatedText: text });
+    res.json({
+      success: true,
+      translatedText: text,
+      isAiGenerated: false,
+      engine: 'Offline clinical rules (Fallback mode)',
+      safetyNotice: 'AI-assisted translation — verify important medical information with a healthcare professional.'
+    });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: error.message || 'Translation error'
+      }
+    });
   }
 });
 
@@ -136,11 +177,17 @@ Reason: ${reason}
 Vitals: BP ${vitals?.systolicBp}/${vitals?.diastolicBp}, SpO2 ${vitals?.spo2}%, Pulse ${vitals?.pulse}`;
 
         const response = await ai.models.generateContent({
-          model: 'gemini-3.6-flash',
+          model: 'gemini-3.8-flash',
           contents: prompt,
         });
 
-        return res.json({ success: true, summary: response.text?.trim() });
+        return res.json({
+          success: true,
+          summary: response.text?.trim(),
+          isAiGenerated: true,
+          engine: 'Gemini • Online',
+          safetyNotice: 'AI-assisted referral summary — final clinical handoff verification required by referring Medical Officer.'
+        });
       } catch (geminiErr: any) {
         console.warn('[AI Referral Summary] Gemini warning:', geminiErr?.message || geminiErr);
       }
@@ -149,9 +196,18 @@ Vitals: BP ${vitals?.systolicBp}/${vitals?.diastolicBp}, SpO2 ${vitals?.spo2}%, 
     // Default clinical summary
     res.json({
       success: true,
-      summary: `Patient ${patient?.name || 'Patient'} (${patient?.age || 45}y, ${patient?.gender || 'M'}) referred to ${destination || 'District Hospital'} for ${diagnosis || 'further evaluation'}. Reason: ${reason || 'Specialist escalation'}. Vitals stable but require tertiary monitoring.`
+      summary: `Patient ${patient?.name || 'Patient'} (${patient?.age || 45}y, ${patient?.gender || 'M'}) referred to ${destination || 'District Hospital'} for ${diagnosis || 'further evaluation'}. Reason: ${reason || 'Specialist escalation'}. Vitals stable but require tertiary monitoring.`,
+      isAiGenerated: false,
+      engine: 'Offline clinical rules (Fallback mode)',
+      safetyNotice: 'AI-assisted referral summary — final clinical handoff verification required by referring Medical Officer.'
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: error.message || 'Referral summary generation error'
+      }
+    });
   }
 });

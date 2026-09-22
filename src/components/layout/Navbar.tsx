@@ -16,6 +16,7 @@ import {
 import { useApp, demoUsers } from '../../services/store';
 import { UserRole, LanguageCode } from '../../types';
 import { EmergencyModal } from '../common/EmergencyModal';
+import { BrandLogo } from '../common/BrandLogo';
 
 export const Navbar: React.FC = () => {
   const {
@@ -33,6 +34,9 @@ export const Navbar: React.FC = () => {
     isSyncing,
     offlineQueue,
     syncOfflineQueue,
+    isLiveConnected,
+    dataSource,
+    isDemoPersona,
     notifications,
     markNotificationRead
   } = useApp();
@@ -56,10 +60,35 @@ export const Navbar: React.FC = () => {
     <>
       {/* Top System Status Ribbon */}
       <div className="bg-[#0F362E] text-emerald-100 text-[11px] py-1 px-4 border-b border-emerald-900/50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
             <span>Public Healthcare • Connected Care Platform</span>
+            
+            {/* Live Data Source Indicator */}
+            {dataSource === 'live' ? (
+              <span className="inline-flex items-center gap-1 bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-2 py-0.2 rounded text-[10px] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Live Firestore Sync</span>
+              </span>
+            ) : dataSource === 'offline' ? (
+              <span className="inline-flex items-center gap-1 bg-rose-950/80 text-rose-300 border border-rose-800/60 px-2 py-0.2 rounded text-[10px] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                <span>Offline Storage • {offlineQueue.length} Queued</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 bg-amber-950/80 text-amber-300 border border-amber-800/60 px-2 py-0.2 rounded text-[10px] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span>Cached Local Snapshot</span>
+              </span>
+            )}
+
+            {/* Demo Persona Indicator */}
+            {isDemoPersona && (
+              <span className="hidden sm:inline-flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.2 rounded text-[10px] font-bold uppercase tracking-wider">
+                Demo Persona Active
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
@@ -77,24 +106,13 @@ export const Navbar: React.FC = () => {
       <header className="bg-[#FAF9F6] border-b-2 border-stone-300 sticky top-0 z-40 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
           {/* Logo & Identity */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#164E43] text-white flex items-center justify-center font-black text-xl shadow-xs border border-emerald-800 shrink-0">
-              <Activity className="w-6 h-6 text-amber-400" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-xl text-[#164E43] tracking-tight">
-                  {t('appName')}
-                </span>
-                <span className="text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold px-1.5 py-0.2 rounded uppercase">
-                  Public Health
-                </span>
-              </div>
-              <p className="text-xs text-stone-600 font-medium hidden sm:block">
-                {t('tagline')}
-              </p>
-            </div>
-          </div>
+          <BrandLogo
+            size="md"
+            showWordmark={true}
+            showTagline={true}
+            taglineText={t('tagline') || 'Connected care. Closer to home.'}
+            badge="Public Health"
+          />
 
           {/* Right Action Bar Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
@@ -253,10 +271,10 @@ export const Navbar: React.FC = () => {
                   <div className="p-2.5 bg-stone-50 border border-stone-200 rounded-lg mb-2">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 overflow-hidden">
-                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${firebaseUser ? 'bg-emerald-500 ring-2 ring-emerald-200' : 'bg-stone-400'}`} />
+                        <BrandLogo size="xs" />
                         <div className="overflow-hidden">
                           <p className="text-[11px] font-bold text-stone-800 truncate">
-                            {firebaseUser ? (firebaseUser.displayName || 'Authenticated User') : 'Local Active Session'}
+                            {firebaseUser ? (firebaseUser.displayName || 'Authenticated User') : 'Saathi Care Account'}
                           </p>
                           <p className="text-[10px] text-stone-500 font-mono truncate">
                             {firebaseUser?.email || 'Sign in with Google to bind role'}

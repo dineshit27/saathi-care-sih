@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../services/store';
 import { MedicineStock } from '../../types';
+import { BrandLogo } from '../../components/common/BrandLogo';
 
 export const MedicineFinder: React.FC = () => {
   const { medicines, updateMedicineQuantity, currentUser, t } = useApp();
@@ -51,8 +52,9 @@ export const MedicineFinder: React.FC = () => {
       <div className="bg-white border-2 border-stone-200 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
+            <BrandLogo size="xs" />
             <span className="text-xs font-bold uppercase bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full">
-              Dispensary &amp; Pharmacy
+              Saathi Pharmacy &amp; Stock
             </span>
             <span className="text-xs text-stone-500 font-mono">
               Public Health Essential Drug List

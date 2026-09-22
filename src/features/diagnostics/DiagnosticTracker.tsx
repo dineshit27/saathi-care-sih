@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../services/store';
 import { DiagnosticOrder } from '../../types';
+import { BrandLogo } from '../../components/common/BrandLogo';
 
 export const DiagnosticTracker: React.FC = () => {
   const {
@@ -74,8 +75,9 @@ export const DiagnosticTracker: React.FC = () => {
       <div className="bg-white border-2 border-stone-200 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
+            <BrandLogo size="xs" />
             <span className="text-xs font-bold uppercase bg-teal-100 text-teal-900 px-2.5 py-0.5 rounded-full">
-              Public Health Diagnostics
+              Saathi Diagnostic Registry
             </span>
             <span className="text-xs text-stone-500 font-mono">
               Sample Collection &amp; Report Registry

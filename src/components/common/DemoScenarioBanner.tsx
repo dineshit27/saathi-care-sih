@@ -1,6 +1,7 @@
 import React from 'react';
 import { Play, RotateCcw, ChevronRight, ChevronLeft, Sparkles, CheckCircle, Activity } from 'lucide-react';
 import { useApp } from '../../services/store';
+import { BrandLogo } from './BrandLogo';
 
 export const DemoScenarioBanner: React.FC = () => {
   const { demoScenarioStep, runDemoStep, resetAllData } = useApp();
@@ -28,9 +29,9 @@ export const DemoScenarioBanner: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Badge & Title */}
           <div className="flex items-center gap-2.5">
-            <div className="bg-amber-400 text-[#164E43] px-2 py-1 rounded-lg font-black shrink-0 flex items-center gap-1.5 text-xs">
-              <Activity className="w-3.5 h-3.5" />
-              <span>SAATHI CARE</span>
+            <div className="bg-white/10 border border-white/20 px-2 py-1 rounded-lg shrink-0 flex items-center gap-1.5 text-xs">
+              <BrandLogo size="xs" variant="light" />
+              <span className="text-white font-extrabold tracking-tight">SAATHI CARE</span>
             </div>
             <div>
               <div className="flex items-center gap-2">

@@ -16,6 +16,7 @@ import {
 import { useApp } from '../../services/store';
 import { Referral } from '../../types';
 import { CareContinuityBar } from '../../components/common/CareContinuityBar';
+import { BrandLogo } from '../../components/common/BrandLogo';
 
 export const ReferralTracker: React.FC = () => {
   const {
@@ -62,8 +63,9 @@ export const ReferralTracker: React.FC = () => {
       <div className="bg-white border-2 border-stone-200 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
+            <BrandLogo size="xs" />
             <span className="text-xs font-bold uppercase bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full">
-              Continuity Command
+              Saathi Continuity Command
             </span>
             <span className="text-xs text-stone-500 font-mono">
               Maharashtra Inter-Facility Network
@@ -188,6 +190,7 @@ export const ReferralTracker: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b pb-4">
                 <div>
                   <div className="flex items-center gap-2">
+                    <BrandLogo size="xs" />
                     <span className="bg-[#164E43] text-white text-xs font-mono font-bold px-2.5 py-0.5 rounded-md">
                       {selectedRef.id}
                     </span>

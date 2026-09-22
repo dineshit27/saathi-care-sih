@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { AuthenticatedRequest, requireRole } from '../middleware/auth';
 import { getCollectionDocs, getDocById, setDocument, updateDocument } from '../dbHelper';
 
 export const medicinesRouter = Router();
@@ -10,20 +10,40 @@ medicinesRouter.get('/', async (req: AuthenticatedRequest, res: Response) => {
     const medicines = await getCollectionDocs('medicines');
     res.json({ success: true, count: medicines.length, data: medicines });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Failed to fetch medicines' }
+    });
   }
 });
 
 // PATCH /api/medicines/:id
-medicinesRouter.patch('/:id', async (req: AuthenticatedRequest, res: Response) => {
+medicinesRouter.patch('/:id', requireRole('facility', 'doctor', 'admin'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { availableQuantity } = req.body;
-    const med = await getDocById('medicines', req.params.id);
-    if (!med) {
-      return res.status(404).json({ success: false, error: 'Medicine not found' });
+    if (availableQuantity === undefined || availableQuantity === null) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_INPUT', message: 'availableQuantity is required.' }
+      });
     }
 
     const qty = Number(availableQuantity);
+    if (isNaN(qty) || qty < 0) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_INPUT', message: 'availableQuantity must be a valid non-negative number.' }
+      });
+    }
+
+    const med = await getDocById('medicines', req.params.id);
+    if (!med) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Medicine not found' }
+      });
+    }
+
     const status = qty === 0 ? 'out_of_stock' : qty < 30 ? 'low_stock' : 'available';
 
     const updated = await updateDocument('medicines', req.params.id, {
@@ -49,6 +69,10 @@ medicinesRouter.patch('/:id', async (req: AuthenticatedRequest, res: Response) =
 
     res.json({ success: true, data: updated });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message || 'Failed to update medicine inventory' }
+    });
   }
 });
+
