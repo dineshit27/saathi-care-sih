@@ -1,0 +1,320 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Healthcare provider or citizen user profile with role-based access control",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["patient", "asha", "doctor", "facility", "admin"] },
+        "roleTitle": { "type": "string" },
+        "facilityId": { "type": "string" },
+        "facilityName": { "type": "string" },
+        "village": { "type": "string" },
+        "preferredLanguage": { "type": "string", "enum": ["en", "mr", "hi"] },
+        "phone": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "role"]
+    },
+    "Patient": {
+      "title": "Patient",
+      "description": "Registered patient in the public health system with demographics and care continuity index",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "abhaId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 100 },
+        "age": { "type": "number" },
+        "gender": { "type": "string", "enum": ["Female", "Male", "Other"] },
+        "phone": { "type": "string" },
+        "village": { "type": "string" },
+        "taluka": { "type": "string" },
+        "preferredLanguage": { "type": "string", "enum": ["en", "mr", "hi"] },
+        "emergencyContact": { "type": "object" },
+        "existingConditions": { "type": "array" },
+        "currentSymptoms": { "type": "array" },
+        "vitals": { "type": "object" },
+        "riskLevel": { "type": "string", "enum": ["routine", "urgent", "emergency", "follow-up"] },
+        "consent": { "type": "object" },
+        "registeredAt": { "type": "string" },
+        "registeredByRole": { "type": "string" },
+        "assignedAsha": { "type": "string" },
+        "careContinuityScore": { "type": "object" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "age", "gender", "village"]
+    },
+    "QueueEntry": {
+      "title": "QueueEntry",
+      "description": "Real-time consultation queue token at a public healthcare facility",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "tokenNumber": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientAge": { "type": "number" },
+        "patientGender": { "type": "string" },
+        "patientVillage": { "type": "string" },
+        "facilityId": { "type": "string" },
+        "facilityName": { "type": "string" },
+        "doctorId": { "type": "string" },
+        "doctorName": { "type": "string" },
+        "status": { "type": "string", "enum": ["waiting", "in_consultation", "completed", "deferred", "no_show"] },
+        "priority": { "type": "string", "enum": ["routine", "urgent", "emergency", "follow-up"] },
+        "joinedAt": { "type": "string" },
+        "estimatedWaitMinutes": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "tokenNumber", "patientId", "facilityId", "status"]
+    },
+    "Referral": {
+      "title": "Referral",
+      "description": "Inter-facility transfer pass connecting PHC to Secondary/Tertiary Hospital",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientAge": { "type": "number" },
+        "patientGender": { "type": "string" },
+        "patientVillage": { "type": "string" },
+        "fromFacilityId": { "type": "string" },
+        "fromFacilityName": { "type": "string" },
+        "toFacilityId": { "type": "string" },
+        "toFacilityName": { "type": "string" },
+        "referringDoctorName": { "type": "string" },
+        "receivingDoctorName": { "type": "string" },
+        "reason": { "type": "string" },
+        "priority": { "type": "string", "enum": ["routine", "urgent", "emergency", "follow-up"] },
+        "provisionalDiagnosis": { "type": "string" },
+        "clinicalNotes": { "type": "string" },
+        "status": { "type": "string", "enum": ["created", "sent", "accepted", "scheduled", "confirmed", "completed", "follow_up_pending"] },
+        "appointmentDate": { "type": "string" },
+        "appointmentTime": { "type": "string" },
+        "transportAssisted": { "type": "boolean" },
+        "specialistRequired": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "patientId", "fromFacilityId", "toFacilityId", "status"]
+    },
+    "DiagnosticOrder": {
+      "title": "DiagnosticOrder",
+      "description": "Laboratory and imaging test order with specimen and result workflow",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "testType": { "type": "string" },
+        "facilityId": { "type": "string" },
+        "facilityName": { "type": "string" },
+        "requestingDoctor": { "type": "string" },
+        "status": { "type": "string", "enum": ["requested", "scheduled", "sample_collected", "processing", "result_available", "doctor_reviewed"] },
+        "requestedAt": { "type": "string" },
+        "sampleCollectedAt": { "type": "string" },
+        "completedAt": { "type": "string" },
+        "resultSummary": { "type": "string" },
+        "findings": { "type": "string" },
+        "isAbnormal": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "patientId", "testType", "facilityId", "status"]
+    },
+    "MedicineStock": {
+      "title": "MedicineStock",
+      "description": "Inventory availability at public health dispensary",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "medicineName": { "type": "string" },
+        "genericName": { "type": "string" },
+        "dosage": { "type": "string" },
+        "dosageForm": { "type": "string" },
+        "strength": { "type": "string" },
+        "category": { "type": "string" },
+        "facilityId": { "type": "string" },
+        "facilityName": { "type": "string" },
+        "availableQuantity": { "type": "number" },
+        "unit": { "type": "string" },
+        "status": { "type": "string", "enum": ["available", "low_stock", "out_of_stock"] },
+        "alternativeSuggestions": { "type": "array" },
+        "batchNumber": { "type": "string" },
+        "lastUpdated": { "type": "string" }
+      },
+      "required": ["id", "medicineName", "facilityId", "availableQuantity", "status"]
+    },
+    "FollowUpTask": {
+      "title": "FollowUpTask",
+      "description": "Community follow-up visit task assigned to village frontline worker",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientVillage": { "type": "string" },
+        "phone": { "type": "string" },
+        "category": { "type": "string" },
+        "assignedAshaName": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["due", "contacted", "visit_scheduled", "completed", "escalated", "overdue"] },
+        "reason": { "type": "string" },
+        "lastVisitNotes": { "type": "string" },
+        "completedAt": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "patientId", "status", "dueDate"]
+    },
+    "HealthTimelineEvent": {
+      "title": "HealthTimelineEvent",
+      "description": "Longitudinal continuity of care event record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "facilityId": { "type": "string" },
+        "facilityName": { "type": "string" },
+        "providerName": { "type": "string" },
+        "providerRole": { "type": "string" },
+        "eventType": { "type": "string" },
+        "title": { "type": "string" },
+        "notes": { "type": "string" },
+        "vitals": { "type": "object" },
+        "badgeType": { "type": "string" }
+      },
+      "required": ["id", "patientId", "eventType", "title"]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "Real-time alert for clinical and referral transitions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "recipientRole": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string" },
+        "read": { "type": "boolean" },
+        "timestamp": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "message", "type"]
+    },
+    "AuditLogEntry": {
+      "title": "AuditLogEntry",
+      "description": "Immutable compliance and audit trail record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "userName": { "type": "string" },
+        "userRole": { "type": "string" },
+        "action": { "type": "string" },
+        "entityType": { "type": "string" },
+        "entityId": { "type": "string" },
+        "facilityName": { "type": "string" },
+        "details": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userName", "userRole", "action"]
+    },
+    "EmergencyEvent": {
+      "title": "EmergencyEvent",
+      "description": "108 ambulance dispatch and medical emergency escalation event",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "facilityId": { "type": "string" },
+        "facilityName": { "type": "string" },
+        "triggeredBy": { "type": "string" },
+        "triggeredByRole": { "type": "string" },
+        "reason": { "type": "string" },
+        "priority": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "patientId", "reason", "status"]
+    },
+    "Facility": {
+      "title": "Facility",
+      "description": "Government healthcare institution node in the district care network",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "district": { "type": "string" },
+        "taluka": { "type": "string" },
+        "contactNumber": { "type": "string" },
+        "activeDoctors": { "type": "number" },
+        "ambulanceAvailable": { "type": "boolean" },
+        "totalQueueToday": { "type": "number" },
+        "capacityLevel": { "type": "string" }
+      },
+      "required": ["id", "name", "type", "district"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and assigned healthcare operational roles"
+    },
+    "/patients/{patientId}": {
+      "schema": "Patient",
+      "description": "Registered rural and underserved patients with clinical history and care continuity score"
+    },
+    "/queueEntries/{entryId}": {
+      "schema": "QueueEntry",
+      "description": "Live clinic consultation queue tokens with real-time sync across frontline, doctor, and patient"
+    },
+    "/referrals/{referralId}": {
+      "schema": "Referral",
+      "description": "Inter-facility specialist referral passes with bidirectional acceptance status"
+    },
+    "/diagnostics/{diagnosticId}": {
+      "schema": "DiagnosticOrder",
+      "description": "Point-of-care and laboratory diagnostic orders and report status"
+    },
+    "/medicines/{medicineId}": {
+      "schema": "MedicineStock",
+      "description": "Dispensary medicine inventory stock and availability indicators"
+    },
+    "/followUps/{followUpId}": {
+      "schema": "FollowUpTask",
+      "description": "Frontline worker home-visit tasks and post-referral verification"
+    },
+    "/healthRecords/{recordId}": {
+      "schema": "HealthTimelineEvent",
+      "description": "Longitudinal chronological timeline events tracking patient progress"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "AppNotification",
+      "description": "Real-time clinical event notifications and push alerts"
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLogEntry",
+      "description": "Immutable security and clinical operation audit logs"
+    },
+    "/emergencyEvents/{eventId}": {
+      "schema": "EmergencyEvent",
+      "description": "Priority emergency ambulance dispatch and hospital alerts"
+    },
+    "/facilities/{facilityId}": {
+      "schema": "Facility",
+      "description": "Public health network facilities directory"
+    }
+  }
+}

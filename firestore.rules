@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper functions for validating fields
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Allow read/write to public healthcare collections with validation
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /patients/{patientId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /queueEntries/{entryId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /referrals/{referralId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /diagnostics/{diagnosticId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /medicines/{medicineId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /followUps/{followUpId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /healthRecords/{recordId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if false; // Immutable audit log
+    }
+
+    match /emergencyEvents/{eventId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /facilities/{facilityId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Connection testing
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

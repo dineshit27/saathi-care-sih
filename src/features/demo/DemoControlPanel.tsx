@@ -8,7 +8,7 @@ import {
   ChevronRight,
   ChevronLeft,
   CheckCircle2,
-  Award,
+  Activity,
   Layers,
   ArrowRight,
   ExternalLink
@@ -169,14 +169,14 @@ export const DemoControlPanel: React.FC<Props> = ({ setActiveTab }) => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 bg-amber-400 text-stone-950 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-2">
-              <Award className="w-4 h-4" />
-              <span>SIH 2026 Judge Presentation Command</span>
+              <Activity className="w-4 h-4" />
+              <span>Care Journey Controls</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-              Interactive Care Continuity Demonstration Flow
+              Interactive Care Continuity Journey
             </h1>
             <p className="text-xs sm:text-sm text-emerald-100 mt-1 max-w-2xl">
-              Execute the complete 12-stage patient journey with real, live database mutations. Observe how Saathi Care ensures the patient journey never ends at referral.
+              Follow the end-to-end 12-stage patient journey across community, primary care, diagnostic, referral, and follow-up touchpoints.
             </p>
           </div>
 
@@ -186,7 +186,7 @@ export const DemoControlPanel: React.FC<Props> = ({ setActiveTab }) => {
               className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/30 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5 text-amber-300" />
-              <span>Reset Demo State</span>
+              <span>Reset Journey State</span>
             </button>
           </div>
         </div>
@@ -245,16 +245,16 @@ export const DemoControlPanel: React.FC<Props> = ({ setActiveTab }) => {
               onClick={() => handleStepJump(Math.min(12, (demoScenarioStep || 0) + 1))}
               className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-stone-950 font-black text-xs rounded-xl shadow-md flex items-center gap-2 transition-all cursor-pointer"
             >
-              <span>{demoScenarioStep === 0 ? 'Start Demonstration' : 'Next Step →'}</span>
+              <span>{demoScenarioStep === 0 ? 'Start Care Journey' : 'Next Stage →'}</span>
             </button>
           </div>
         </div>
 
-        {/* Problem vs Solution Comparison for Judges */}
+        {/* Challenge vs Solution Workflow Analysis */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl">
             <span className="font-bold text-rose-900 uppercase text-[10px] block mb-1">
-              Rural Healthcare Bottleneck (Current Reality):
+              Care Access Challenge (Current System):
             </span>
             <p className="text-stone-800 leading-relaxed font-medium">
               {currentStepData.problem}
@@ -263,7 +263,7 @@ export const DemoControlPanel: React.FC<Props> = ({ setActiveTab }) => {
 
           <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-2xl">
             <span className="font-bold text-emerald-950 uppercase text-[10px] block mb-1">
-              Saathi Care Innovation (The Solution):
+              Connected Care Solution:
             </span>
             <p className="text-stone-800 leading-relaxed font-medium">
               {currentStepData.solution}
@@ -271,10 +271,10 @@ export const DemoControlPanel: React.FC<Props> = ({ setActiveTab }) => {
           </div>
         </div>
 
-        {/* Presenter Speaking Cue */}
+        {/* Operational Workflow Cue */}
         <div className="p-4 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-between gap-3 text-xs">
           <div>
-            <span className="font-bold text-stone-700 block">Presenter Action Note:</span>
+            <span className="font-bold text-stone-700 block">Workflow Action Note:</span>
             <p className="text-stone-600 mt-0.5">{currentStepData.actionNote}</p>
           </div>
 

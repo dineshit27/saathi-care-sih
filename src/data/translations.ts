@@ -5,10 +5,10 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     // Brand & Header
     appName: 'Saathi Care',
     tagline: 'Connected care. Closer to home.',
-    govtHeader: 'Government of Maharashtra • Department of Skills & Innovation • SIH 2026',
-    problemId: 'Problem Statement ID: 26133',
-    demoModeBadge: 'SIH 2026 PROTOTYPE DEMO',
-    demoNotice: 'Prototype demonstration environment with realistic simulated public-health data.',
+    govtHeader: 'Public Healthcare • Connected Care Platform',
+    problemId: 'Continuous Care Network',
+    demoModeBadge: 'CARE JOURNEY CONTROLS',
+    demoNotice: 'Interactive continuous care demonstration with integrated public-health data.',
     emergencyNotice: 'Emergency? Dial 108 for Public Ambulance or 104 for Health Helpline.',
     
     // Roles
@@ -31,7 +31,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     nav_followups: 'High-Risk Follow-up',
     nav_analytics: 'District Analytics',
     nav_audit: 'Audit Log',
-    nav_demo_panel: 'SIH Demo Panel',
+    nav_demo_panel: 'Care Journey',
 
     // Common
     online: 'Online',
@@ -57,7 +57,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     heroSubhead: 'Saathi Care connects patients, frontline ASHA workers and public health facilities to make healthcare access faster, more continuous and more accountable.',
     getCareCta: 'Get Healthcare Support',
     workerLoginCta: 'Frontline Worker & Staff Access',
-    demoWalkthroughCta: 'Launch 2-Minute SIH Demo',
+    demoWalkthroughCta: 'Explore Care Journey',
     
     // Core Workflow Flow
     flow_step1: 'Patient',
@@ -106,10 +106,10 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     // Marathi Translations (मराठी)
     appName: 'साथी केअर',
     tagline: 'सलग आरोग्य सेवा. आपल्या घराच्या जवळ.',
-    govtHeader: 'महाराष्ट्र शासन • कौशल्य आणि नाविन्यता विभाग • SIH 2026',
-    problemId: 'समस्या विवरण क्र: 26133',
-    demoModeBadge: 'SIH 2026 प्रात्यक्षिक डेमो',
-    demoNotice: 'वास्तविक अनुकरण केलेल्या सार्वजनिक आरोग्य डेटासह प्रात्यक्षिक वातावरण.',
+    govtHeader: 'सार्वजनिक आरोग्य • जोडलेली आरोग्य सेवा प्रणाली',
+    problemId: 'सलग आरोग्य सेवा नेटवर्क',
+    demoModeBadge: 'आरोग्य प्रवास प्रात्यक्षिक',
+    demoNotice: 'एकात्मिक सार्वजनिक आरोग्य डेटासह सलग आरोग्य प्रवास प्रात्यक्षिक.',
     emergencyNotice: 'आपत्कालीन? रुग्णवाहिकेसाठी 108 किंवा आरोग्य हेल्पलाईन 104 डायल करा.',
 
     role_patient: 'नागरिक / रुग्ण',
@@ -130,7 +130,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     nav_followups: 'विशेष देखरेख',
     nav_analytics: 'जिल्हा विश्लेषण',
     nav_audit: 'ऑडिट नोंद',
-    nav_demo_panel: 'SIH प्रात्यक्षिक',
+    nav_demo_panel: 'आरोग्य प्रवास',
 
     online: 'ऑनलाइन',
     offline: 'ऑफलाइन मोड',
@@ -154,7 +154,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     heroSubhead: 'साथी केअर रुग्ण, आशा सेविका आणि सरकारी आरोग्य संस्थांना जोडून वेगवान आणि सलग आरोग्य सेवा पुरवते.',
     getCareCta: 'आरोग्य मदत मिळवा',
     workerLoginCta: 'आरोग्य कर्मचारी लॉगिन',
-    demoWalkthroughCta: '२-मिनिटांचा डेमो सुरू करा',
+    demoWalkthroughCta: 'आरोग्य प्रवास पहा',
 
     flow_step1: 'रुग्ण',
     flow_step2: 'आशा सेविका',
@@ -197,10 +197,10 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     // Hindi Translations (हिंदी)
     appName: 'साथी केयर',
     tagline: 'निरंतर देखभाल। आपके घर के पास।',
-    govtHeader: 'महाराष्ट्र सरकार • कौशल और नवाचार विभाग • SIH 2026',
-    problemId: 'समस्या विवरण संख्या: 26133',
-    demoModeBadge: 'SIH 2026 प्रोटोटाइप डेमो',
-    demoNotice: 'यथार्थवादी सार्वजनिक स्वास्थ्य डेटा के साथ प्रदर्शन वातावरण।',
+    govtHeader: 'सार्वजनिक स्वास्थ्य • निरंतर देखभाल मंच',
+    problemId: 'निरंतर स्वास्थ्य नेटवर्क',
+    demoModeBadge: 'देखभाल यात्रा डेमो',
+    demoNotice: 'एकीकृत सार्वजनिक स्वास्थ्य डेटा के साथ निरंतर देखभाल प्रदर्शन।',
     emergencyNotice: 'आपातकालीन? एम्बुलेंस के लिए 108 या स्वास्थ्य हेल्पलाइन 104 डायल करें।',
 
     role_patient: 'नागरिक / रोगी',
@@ -221,7 +221,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     nav_followups: 'उच्च जोखिम फॉलो-अप',
     nav_analytics: 'जिला विश्लेषण',
     nav_audit: 'ऑडिट रिकॉर्ड',
-    nav_demo_panel: 'SIH डेमो पैनल',
+    nav_demo_panel: 'देखभाल यात्रा',
 
     online: 'ऑनलाइन',
     offline: 'ऑफ़लाइन मोड',
@@ -245,7 +245,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     heroSubhead: 'साथी केयर मरीजों, आशा कार्यकर्ताओं और सरकारी स्वास्थ्य केंद्रों को जोड़ता है ताकि स्वास्थ्य सेवा तेज़, निरंतर और जवाबदेह बने।',
     getCareCta: 'स्वास्थ्य सहायता प्राप्त करें',
     workerLoginCta: 'स्वास्थ्य कार्यकर्ता लॉगिन',
-    demoWalkthroughCta: '2-मिनट का डेमो शुरू करें',
+    demoWalkthroughCta: 'देखभाल यात्रा देखें',
 
     flow_step1: 'रोगी',
     flow_step2: 'आशा कार्यकर्ता',

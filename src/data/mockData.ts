@@ -76,6 +76,48 @@ export const initialFacilities: Facility[] = [
 
 export const initialPatients: Patient[] = [
   {
+    id: 'pat-meena',
+    abhaId: '91-4509-2231-7788',
+    name: 'Meena Sharma',
+    age: 29,
+    gender: 'Female',
+    phone: '+91 98345 88912',
+    village: 'Koregaon Bhima',
+    taluka: 'Shirur',
+    preferredLanguage: 'mr',
+    emergencyContact: {
+      name: 'Sunil Sharma',
+      relationship: 'Husband',
+      phone: '+91 98345 88913'
+    },
+    existingConditions: ['Second Trimester Antenatal Care', 'Mild Gestational Anemia'],
+    currentSymptoms: ['Morning dizziness', 'Occasional visual blurriness', 'Mild pedal edema'],
+    vitals: {
+      temperature: 98.6,
+      pulse: 88,
+      systolicBp: 142,
+      diastolicBp: 92,
+      spo2: 98,
+      respiratoryRate: 18,
+      weight: 58,
+      recordedAt: '2026-09-21 08:00 AM'
+    },
+    riskLevel: 'urgent',
+    consent: {
+      status: true,
+      timestamp: '2026-09-21T07:45:00Z',
+      version: 'MH-PHC-CONSENT-2026.1'
+    },
+    registeredAt: '2026-09-21T07:45:00Z',
+    registeredByRole: 'asha',
+    assignedAsha: 'Sunita Tai Gavade',
+    careContinuityScore: {
+      completedSteps: 2,
+      totalSteps: 5,
+      lastMilestone: 'Assisted Digital Triage Completed'
+    }
+  },
+  {
     id: 'pat-001',
     abhaId: '91-4432-8871-0023',
     name: 'Ramesh Patil',

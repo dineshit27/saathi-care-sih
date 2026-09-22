@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, RotateCcw, ChevronRight, ChevronLeft, Sparkles, CheckCircle, Award } from 'lucide-react';
+import { Play, RotateCcw, ChevronRight, ChevronLeft, Sparkles, CheckCircle, Activity } from 'lucide-react';
 import { useApp } from '../../services/store';
 
 export const DemoScenarioBanner: React.FC = () => {
@@ -28,23 +28,25 @@ export const DemoScenarioBanner: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Badge & Title */}
           <div className="flex items-center gap-2.5">
-            <div className="bg-amber-400 text-[#164E43] p-1.5 rounded-lg font-black shrink-0 flex items-center gap-1 text-xs">
-              <Award className="w-4 h-4" />
-              <span>SIH 2026</span>
+            <div className="bg-amber-400 text-[#164E43] px-2 py-1 rounded-lg font-black shrink-0 flex items-center gap-1.5 text-xs">
+              <Activity className="w-3.5 h-3.5" />
+              <span>SAATHI CARE</span>
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
-                  Interactive Care Continuity Flow
+                  Connected Care Continuity
                 </span>
-                <span className="text-[11px] bg-emerald-800/80 px-2 py-0.2 rounded-full border border-emerald-600/40">
-                  Step {demoScenarioStep > 0 ? demoScenarioStep : 'Overview'}/12
-                </span>
+                {demoScenarioStep > 0 && (
+                  <span className="text-[11px] bg-emerald-800/80 px-2 py-0.2 rounded-full border border-emerald-600/40">
+                    Stage {demoScenarioStep} of 12
+                  </span>
+                )}
               </div>
               <p className="text-xs sm:text-sm font-semibold text-emerald-50">
                 {demoScenarioStep > 0
                   ? `${current.label} (${current.role})`
-                  : 'Demonstrating End-to-End Care Continuity for Rural & Underserved Communities'}
+                  : 'Connecting patients, frontline health workers and public health facilities for continuous care.'}
               </p>
             </div>
           </div>
@@ -96,9 +98,9 @@ export const DemoScenarioBanner: React.FC = () => {
 
             <button
               onClick={() => runDemoStep(Math.min(12, (demoScenarioStep || 0) + 1))}
-              className="px-3 py-1.5 rounded-lg bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1 hover:bg-amber-300 transition-colors shadow-xs"
+              className="px-3 py-1.5 rounded-lg bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1 hover:bg-amber-300 transition-colors shadow-xs cursor-pointer"
             >
-              <span>{demoScenarioStep === 0 ? 'Start Demo Flow' : 'Next Step'}</span>
+              <span>{demoScenarioStep === 0 ? 'Start Care Journey' : 'Next Stage'}</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
 

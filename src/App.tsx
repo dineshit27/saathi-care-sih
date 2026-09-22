@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppProvider, useApp } from './services/store';
+import { AuthProvider, AppProvider, useApp } from './services/store';
 import { Navbar } from './components/layout/Navbar';
 import { NavigationTabs, TabId } from './components/layout/NavigationTabs';
 import { DemoScenarioBanner } from './components/common/DemoScenarioBanner';
@@ -81,7 +81,7 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-stone-900 flex flex-col font-sans selection:bg-emerald-200 selection:text-emerald-950">
-      {/* SIH Judge Demo Sequence Banner */}
+      {/* Guided Care Continuity Journey Banner */}
       <DemoScenarioBanner />
 
       {/* Main Navigation Header */}
@@ -95,7 +95,7 @@ const MainAppContent: React.FC = () => {
         {renderView()}
       </main>
 
-      {/* Government & Public Health Footer */}
+      {/* Connected Public Health Footer */}
       <footer className="bg-[#123E35] text-emerald-100 text-xs border-t-2 border-emerald-900 mt-auto">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-6 border-b border-emerald-800/80">
@@ -115,11 +115,11 @@ const MainAppContent: React.FC = () => {
 
             <div>
               <p className="font-bold text-white uppercase text-[11px] tracking-wider mb-2">
-                SIH 2026 Submission
+                Care Continuity Network
               </p>
-              <p className="text-emerald-200 text-xs">Problem Statement ID: <strong>26133</strong></p>
-              <p className="text-emerald-200 text-xs">Theme: MedTech / BioTech / HealthTech</p>
-              <p className="text-emerald-200 text-xs">Department: Maharashtra State Innovation Society</p>
+              <p className="text-emerald-200 text-xs">Primary Health Centre (PHC) Shirur</p>
+              <p className="text-emerald-200 text-xs">Sub-District & District Hospital Grid</p>
+              <p className="text-emerald-200 text-xs">Community Health & ASHA Circles</p>
             </div>
 
             <div>
@@ -145,7 +145,7 @@ const MainAppContent: React.FC = () => {
           </div>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-emerald-300">
-            <p>© 2026 Saathi Care. Developed for Smart India Hackathon (SIH 2026) • Government of Maharashtra.</p>
+            <p>© 2026 Saathi Care • Connected care. Closer to home.</p>
             <p className="font-mono text-amber-300">AI-assisted — final decision remains with the healthcare professional.</p>
           </div>
         </div>
@@ -156,8 +156,10 @@ const MainAppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <AppProvider>
-      <MainAppContent />
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <MainAppContent />
+      </AppProvider>
+    </AuthProvider>
   );
 }

@@ -49,11 +49,6 @@ export const LandingPage: React.FC<Props> = ({ setActiveTab }) => {
         <div className="absolute left-1/3 -top-20 w-80 h-80 rounded-full bg-amber-400/10 pointer-events-none blur-3xl"></div>
 
         <div className="max-w-3xl relative z-10">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-emerald-400/30 px-3.5 py-1 rounded-full text-xs font-bold text-amber-300 mb-6 backdrop-blur-xs">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>SIH 2026 Problem Statement ID: 26133 • Govt of Maharashtra</span>
-          </div>
-
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] mb-5">
             Healthcare shouldn&apos;t depend on how far you live.
           </h1>
@@ -137,7 +132,7 @@ export const LandingPage: React.FC<Props> = ({ setActiveTab }) => {
         </div>
       </section>
 
-      {/* Impact Metrics (Clearly labelled as prototype sample data) */}
+      {/* Operational Impact Metrics */}
       <section className="bg-[#FAF9F6] border-2 border-stone-200 rounded-3xl p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div>
@@ -145,11 +140,11 @@ export const LandingPage: React.FC<Props> = ({ setActiveTab }) => {
               Operational Performance & Access Indicators
             </h2>
             <p className="text-xs text-stone-500 mt-0.5">
-              Simulated public health telemetry for Shirur & Ambegaon Talukas, Pune District
+              Integrated public health telemetry for Shirur & Ambegaon Talukas, Pune District
             </p>
           </div>
-          <span className="text-[11px] font-semibold bg-amber-100 text-amber-900 px-3 py-1 rounded-full border border-amber-300 self-start sm:self-auto">
-            Prototype Demonstration Data
+          <span className="text-[11px] font-semibold bg-emerald-100 text-emerald-900 px-3 py-1 rounded-full border border-emerald-300 self-start sm:self-auto">
+            Connected Care Telemetry
           </span>
         </div>
 

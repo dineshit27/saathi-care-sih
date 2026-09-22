@@ -148,15 +148,15 @@ export const NavigationTabs: React.FC<Props> = ({ activeTab, setActiveTab }) => 
 
           <button
             onClick={() => setActiveTab('demopanel')}
-            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 border border-amber-500/50 transition-all ${
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 border border-amber-500/50 transition-all cursor-pointer ${
               activeTab === 'demopanel'
                 ? 'bg-amber-500 text-stone-950 font-black'
                 : 'bg-amber-50 text-amber-900 hover:bg-amber-100'
             }`}
-            title="SIH 2026 Judge Demo Control Panel"
+            title="Interactive Care Journey Controls"
           >
             <Sliders className="w-3.5 h-3.5 text-amber-700" />
-            <span>SIH Demo Panel</span>
+            <span>Care Journey</span>
           </button>
         </div>
       </div>

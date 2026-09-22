@@ -24,6 +24,10 @@ export const Navbar: React.FC = () => {
     language,
     setLanguage,
     t,
+    firebaseUser,
+    signInWithGoogle,
+    signOutUser,
+    authLoading,
     isOffline,
     toggleOffline,
     isSyncing,
@@ -50,22 +54,20 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Top Civic Government Ribbon */}
+      {/* Top System Status Ribbon */}
       <div className="bg-[#0F362E] text-emerald-100 text-[11px] py-1 px-4 border-b border-emerald-900/50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 font-medium">
-            <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-            <span>{t('govtHeader')}</span>
-            <span className="text-emerald-400 hidden sm:inline">•</span>
-            <span className="font-mono text-amber-300 hidden sm:inline">{t('problemId')}</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Public Healthcare • Connected Care Platform</span>
           </div>
 
           <div className="flex items-center gap-3">
             <span className="hidden md:inline-block text-emerald-300">
               Helpline: <strong>104</strong> | Ambulance: <strong>108</strong>
             </span>
-            <span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold border border-amber-500/30">
-              SIH 2026 MedTech
+            <span className="bg-emerald-900/60 text-emerald-200 px-2 py-0.5 rounded text-[10px] font-semibold border border-emerald-700/50">
+              Continuous Care Network
             </span>
           </div>
         </div>
@@ -246,9 +248,54 @@ export const Navbar: React.FC = () => {
               </button>
 
               {roleMenuOpen && (
-                <div className="absolute right-0 mt-1.5 w-72 bg-white border border-stone-300 rounded-xl shadow-2xl p-2 z-50 text-xs">
-                  <div className="px-2 py-1.5 border-b border-stone-200 mb-1 text-[11px] text-stone-500 font-bold uppercase">
-                    Switch Persona for Evaluation:
+                <div className="absolute right-0 mt-1.5 w-80 bg-white border border-stone-300 rounded-xl shadow-2xl p-2 z-50 text-xs">
+                  {/* Firebase Auth Account Status Header */}
+                  <div className="p-2.5 bg-stone-50 border border-stone-200 rounded-lg mb-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${firebaseUser ? 'bg-emerald-500 ring-2 ring-emerald-200' : 'bg-stone-400'}`} />
+                        <div className="overflow-hidden">
+                          <p className="text-[11px] font-bold text-stone-800 truncate">
+                            {firebaseUser ? (firebaseUser.displayName || 'Authenticated User') : 'Local Active Session'}
+                          </p>
+                          <p className="text-[10px] text-stone-500 font-mono truncate">
+                            {firebaseUser?.email || 'Sign in with Google to bind role'}
+                          </p>
+                        </div>
+                      </div>
+                      <div>
+                        {firebaseUser ? (
+                          <button
+                            onClick={async () => {
+                              await signOutUser();
+                            }}
+                            disabled={authLoading}
+                            className="text-[10px] text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 font-bold px-2 py-1 rounded transition-colors"
+                          >
+                            Sign Out
+                          </button>
+                        ) : (
+                          <button
+                            onClick={async () => {
+                              await signInWithGoogle();
+                            }}
+                            disabled={authLoading}
+                            className="text-[10px] bg-[#164E43] hover:bg-[#123e35] text-white font-bold px-2.5 py-1 rounded transition-colors shadow-2xs"
+                          >
+                            {authLoading ? 'Signing in...' : 'Sign In'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="px-2 py-1 border-b border-stone-200 mb-1.5 text-[11px] text-stone-500 font-bold uppercase flex items-center justify-between">
+                    <span>Switch Active Persona / Role:</span>
+                    {firebaseUser && (
+                      <span className="text-[10px] text-emerald-700 font-mono font-medium lowercase">
+                        synced to cloud
+                      </span>
+                    )}
                   </div>
                   {roles.map(r => (
                     <button
