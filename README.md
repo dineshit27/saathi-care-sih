@@ -1,4 +1,4 @@
-<img src="src/images/github-banner.png" alt="Saathi Care GitHub Banner" width="100%">
+<img src="banner.png" alt="Saathi Care GitHub Banner" width="100%">
 
 <div align="center">
 
