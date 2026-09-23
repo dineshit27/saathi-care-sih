@@ -109,7 +109,7 @@ Saathi Care converts this into a connected journey:
 │                  SAATHI CARE                         │
 ├──────────────────────────────────────────────────────┤
 │                                                      │
-│ Patient                                               │
+│ Patient                                              │
 │    ↓                                                 │
 │ Frontline Worker                                     │
 │    ↓                                                 │
@@ -635,23 +635,15 @@ saathi-care/
 
 ## Frontend
 
-<img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black">
-<img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
-<img src="https://img.shields.io/badge/Vite-8.x-646CFF?style=for-the-badge&logo=vite&logoColor=white">
-<img src="https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white">
+<img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black"> <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white"> <img src="https://img.shields.io/badge/Vite-8.x-646CFF?style=for-the-badge&logo=vite&logoColor=white"> <img src="https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white">
 
 ## Backend
 
-<img src="https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js&logoColor=white">
-<img src="https://img.shields.io/badge/Express.js-API-000000?style=for-the-badge&logo=express&logoColor=white">
-<img src="https://img.shields.io/badge/REST-API-00897B?style=for-the-badge">
+<img src="https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js&logoColor=white"> <img src="https://img.shields.io/badge/Express.js-API-000000?style=for-the-badge&logo=express&logoColor=white"> <img src="https://img.shields.io/badge/REST-API-00897B?style=for-the-badge">
 
 ## Database & Cloud
 
-<img src="https://img.shields.io/badge/Firebase-Cloud-FFCA28?style=for-the-badge&logo=firebase&logoColor=black">
-<img src="https://img.shields.io/badge/Firestore-Realtime-FFCA28?style=for-the-badge&logo=firebase&logoColor=black">
-<img src="https://img.shields.io/badge/Firebase_Auth-Authentication-FFCA28?style=for-the-badge&logo=firebase&logoColor=black">
-<img src="https://img.shields.io/badge/Firebase_Storage-Storage-FFCA28?style=for-the-badge&logo=firebase&logoColor=black">
+<img src="https://img.shields.io/badge/Firebase-Cloud-FFCA28?style=for-the-badge&logo=firebase&logoColor=black"> <img src="https://img.shields.io/badge/Firestore-Realtime-FFCA28?style=for-the-badge&logo=firebase&logoColor=black"> <img src="https://img.shields.io/badge/Firebase_Auth-Authentication-FFCA28?style=for-the-badge&logo=firebase&logoColor=black"> <img src="https://img.shields.io/badge/Firebase_Storage-Storage-FFCA28?style=for-the-badge&logo=firebase&logoColor=black">
 
 ## AI
 
@@ -659,9 +651,7 @@ saathi-care/
 
 ## Offline & PWA
 
-<img src="https://img.shields.io/badge/PWA-Progressive_Web_App-5A0FC8?style=for-the-badge">
-<img src="https://img.shields.io/badge/IndexedDB-Offline_Data-6366F1?style=for-the-badge">
-<img src="https://img.shields.io/badge/Service_Worker-Offline_Support-FF6F00?style=for-the-badge">
+<img src="https://img.shields.io/badge/PWA-Progressive_Web_App-5A0FC8?style=for-the-badge"> <img src="https://img.shields.io/badge/IndexedDB-Offline_Data-6366F1?style=for-the-badge"> <img src="https://img.shields.io/badge/Service_Worker-Offline_Support-FF6F00?style=for-the-badge">
 
 ---
 
@@ -1342,14 +1332,6 @@ Medicine Availability
 Follow-up
 ```
 
-### Live Demo
-
-[Add your deployed URL here]
-
-### Demo Video
-
-[Add your YouTube URL here]
-
 ---
 
 # 📚 Resources
@@ -1360,11 +1342,11 @@ Follow-up
   <img src="https://img.shields.io/badge/💻_Source_Code-GitHub-181717?style=for-the-badge&logo=github">
 </a>
 
-<a href="YOUR_LIVE_DEMO_URL">
+<a href="https://saathi-care.onrender.com/">
   <img src="https://img.shields.io/badge/🚀_Live_Demo-Open-00C853?style=for-the-badge">
 </a>
 
-<a href="YOUR_YOUTUBE_URL">
+<a href="https://youtu.be/xsnPkDFPQ0A?si=ehR6mUD_pKuGs_cs">
   <img src="https://img.shields.io/badge/🎥_Demo_Video-Watch-red?style=for-the-badge&logo=youtube">
 </a>
 
@@ -1437,7 +1419,7 @@ It helps the project gain visibility and supports further development.
 
 ### Built with React, Firebase, Node.js, Gemini AI and a lot of debugging.
 
-**Saathi Care — Connected care. Closer to home.**
+**Saathi Care | Connected care. Closer to home.**
 
 <br>
 
